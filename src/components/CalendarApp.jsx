@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DateNavbar from "./DateNavbar.jsx";
 import CalendarDay from "./CalendarDay.jsx";
 import CalendarGrid from "./CalendarGrid.jsx";
@@ -9,11 +9,28 @@ const WEEKDAY_NAMES = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Ndz"];
 function CalendarApp() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [events, setEvents] = useState([
-    { date: new Date(2025, 7, 15), title: "Spotkanie projektowe" }, // Sierpień
-    { date: new Date(2025, 7, 22), title: "Wizyta u dentysty" },
-    { date: new Date(2025, 8, 1), title: "Rozpoczęcie roku szkolnego" }, // Wrzesień
-  ]);
+  const [events, setEvents] = useState(() => {
+    const savedEventsJSON = localStorage.getItem("calendarEvents");
+
+    if (savedEventsJSON == null) {
+      return [];
+    }
+
+    const parsedEvents = JSON.parse(savedEventsJSON);
+
+    const restoredEvents = parsedEvents.map((event) => {
+      return {
+        title: event.title,
+        date: new Date(event.date),
+      };
+    });
+
+    return restoredEvents;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('calendarEvents', JSON.stringify(events));
+  }, [events]);
 
   const goToPreviousMonth = () => {
     const previousMonth = new Date(currentMonth);
@@ -50,6 +67,15 @@ function CalendarApp() {
 
     for (let i = 1; i <= daysInMonth; i++) {
       let isSelected = false;
+
+      const dayHasEvent = events.some((event) => {
+        const isSameYear =
+          event.date.getFullYear() === currentMonth.getFullYear();
+        const isSameMonth = event.date.getMonth() === currentMonth.getMonth();
+        const isSameDay = event.date.getDate() === i;
+        return isSameYear && isSameMonth && isSameDay;
+      });
+
       if (selectedDate) {
         const isSameYear =
           selectedDate.getFullYear() === currentMonth.getFullYear();
@@ -66,6 +92,7 @@ function CalendarApp() {
           dayNumber={i}
           onDayClick={handleDayClick}
           isSelected={isSelected}
+          hasEvent={dayHasEvent}
         />
       );
     }
@@ -106,9 +133,9 @@ function CalendarApp() {
     });
   }
   const handleAddEvent = (title) => {
-    const newEvent = {date: selectedDate, title: title};
+    const newEvent = { date: selectedDate, title: title };
     setEvents([...events, newEvent]);
-  }
+  };
 
   return (
     <>
@@ -120,7 +147,13 @@ function CalendarApp() {
 
       <CalendarGrid WEEKDAY_NAMES={WEEKDAY_NAMES} calendarDays={calendarDays} />
 
-      {selectedDate && <InfoPanel selectedDate={selectedDate} events={eventsForSelectedDay} onEventAdd={handleAddEvent}/>}
+      {selectedDate && (
+        <InfoPanel
+          selectedDate={selectedDate}
+          events={eventsForSelectedDay}
+          onEventAdd={handleAddEvent}
+        />
+      )}
     </>
   );
 }
