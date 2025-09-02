@@ -1,0 +1,26 @@
+.calendar-day, .calendar-day-empty{
+     border: .1rem solid black;
+     padding: 1rem;
+     text-align: center;
+     cursor: pointer;
+}
+.calendar-day-empty{
+     opacity: .3;
+}
+
+.calendar-grid{
+     display: grid;
+     grid-template-columns: repeat(7, 1fr);
+     gap: .1rem;
+}
+
+.weekday-name {
+  font-weight: bold;
+  text-align: center;
+  padding: 0.5rem;
+  margin-bottom: .5rem;
+}
+
+.selected{
+     border: .1rem solid red;
+}
