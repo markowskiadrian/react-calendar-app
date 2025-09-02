@@ -133,9 +133,13 @@ function CalendarApp() {
     });
   }
   const handleAddEvent = (title) => {
-    const newEvent = { date: selectedDate, title: title };
+    const newEvent = { id: Date.now(), date: selectedDate, title: title };
     setEvents([...events, newEvent]);
   };
+  const handleDeleteEvent = (eventId) => {
+    const updatedEvents = events.filter(event => event.id !== eventId);
+    setEvents(updatedEvents);
+  }
 
   return (
     <>
@@ -152,6 +156,7 @@ function CalendarApp() {
           selectedDate={selectedDate}
           events={eventsForSelectedDay}
           onEventAdd={handleAddEvent}
+          onEventRemoval={handleDeleteEvent}
         />
       )}
     </>

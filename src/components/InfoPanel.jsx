@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function InfoPanel({ selectedDate, events, onEventAdd }) {
+function InfoPanel({ selectedDate, events, onEventAdd, onEventRemoval }) {
   const [newEventTitle, setNewEventTitle] = useState("");
   const formattedDate = selectedDate.toLocaleString("pl-PL", {
     weekday: "long",
@@ -21,8 +21,11 @@ function InfoPanel({ selectedDate, events, onEventAdd }) {
         <h4>Wydarzenia:</h4>
         {events.length > 0 ? (
           <ul>
-            {events.map((event, index) => (
-              <li key={index}>{event.title}</li>
+            {events.map((event) => (
+              <li key={event.id}>
+                {event.title}
+                <button onClick={() => onEventRemoval(event.id)}>Usuń</button>
+              </li>
             ))}
           </ul>
         ) : (
