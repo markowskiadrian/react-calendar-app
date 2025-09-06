@@ -20,6 +20,7 @@ function CalendarApp() {
 
     const restoredEvents = parsedEvents.map((event) => {
       return {
+        id: event.id,
         title: event.title,
         date: new Date(event.date),
       };
@@ -121,6 +122,20 @@ function CalendarApp() {
   const paddingDays = getPaddingDays();
   const calendarDays = [...paddingDays, ...daysOfMonth];
 
+  const handleUpdateEvent = (eventId, newTitle) => {
+    const updatedEvents = events.map(event => {
+      if(event.id === eventId){
+        return {
+          ...event, title: newTitle
+        }
+      } else {
+        return event;
+      }
+    })
+
+    setEvents(updatedEvents);
+  }
+
   let eventsForSelectedDay = [];
   if (selectedDate) {
     eventsForSelectedDay = events.filter((event) => {
@@ -157,6 +172,7 @@ function CalendarApp() {
           events={eventsForSelectedDay}
           onEventAdd={handleAddEvent}
           onEventRemoval={handleDeleteEvent}
+          onEventUpdate={handleUpdateEvent}
         />
       )}
     </>

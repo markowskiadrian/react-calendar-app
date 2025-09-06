@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function InfoPanel({ selectedDate, events, onEventAdd, onEventRemoval }) {
+function InfoPanel({ selectedDate, events, onEventAdd, onEventRemoval, onEventUpdate }) {
   const [newEventTitle, setNewEventTitle] = useState("");
   const formattedDate = selectedDate.toLocaleString("pl-PL", {
     weekday: "long",
@@ -8,10 +8,24 @@ function InfoPanel({ selectedDate, events, onEventAdd, onEventRemoval }) {
     month: "long",
     year: "numeric",
   });
+  const [editingEventId, setEditingEventId] = useState(null);
+  const [editedTitle, setEditedTitle] = useState("");
+
   const handleSubmit = () => {
     onEventAdd(newEventTitle);
     setNewEventTitle("");
   };
+
+  const handleEditClick = (event) => {
+    setEditingEventId(event.id);
+    setEditedTitle(event.title);
+  }
+
+  const handleSaveClick = () => {
+    onEventUpdate(editingEventId, editedTitle);
+    setEditingEventId(null);
+  }
+
   return (
     <>
       <div className="info-panel">
@@ -22,10 +36,22 @@ function InfoPanel({ selectedDate, events, onEventAdd, onEventRemoval }) {
         {events.length > 0 ? (
           <ul>
             {events.map((event) => (
-              <li key={event.id}>
-                {event.title}
-                <button onClick={() => onEventRemoval(event.id)}>Usuń</button>
-              </li>
+              event.id === editingEventId ? (
+                <li key={event.id}>
+                  <input
+                    type="text"
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                  />
+                  <button onClick={handleSaveClick}>Zapisz</button>
+                </li>
+              ) : (
+                <li key={event.id}>
+                  {event.title}
+                  <button onClick={() => handleEditClick(event)}>Edyuj</button>
+                  <button onClick={() => onEventRemoval(event.id)}>Usuń</button>
+                </li>
+              )
             ))}
           </ul>
         ) : (
